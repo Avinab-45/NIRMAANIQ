@@ -1,6 +1,5 @@
 import React from 'react';
 import { HeroParticleWave } from './HeroParticleWave';
-import { WaveDivider } from '../ui/WaveDivider';
 
 export const HeroSection: React.FC = () => {
   return (
@@ -60,11 +59,8 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Prominent KPIT-Inspired 3D Particle Wave Feature */}
+      {/* 3D construction skyline (particle-based) */}
       <HeroParticleWave />
-
-      {/* Organic Flowing Layered Wave Transition to Metrics Band */}
-      <WaveDivider variant="hero-bottom" />
     </section>
   );
 };
