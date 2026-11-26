@@ -229,3 +229,60 @@ Detailed entity-to-table mappings, foreign keys, and column constraints across a
 - **Supabase Client Authentication**: Clients authenticate passwordless via Supabase Email OTP with custom Gmail SMTP.
 - **SMTP Server**: For sending contractor 6-digit OTP verification emails, configure Gmail or custom SMTP in `.env`.
 - **AI & ML Integration**: The backend contains a fully decoupled integration framework ready for your teammate's YOLO11 Python FastAPI microservice (see [`YOLO11_FASTAPI_INTEGRATION.md`](YOLO11_FASTAPI_INTEGRATION.md)). When `ML_SERVICE_ENABLED=false` or when FastAPI is not yet running, the backend operates 100% normally and all project, photo, and progress functionality executes independently. Secondary visual analysis via `AiVisionClient` and `GeminiVisionClient` remains available as an optional fallback without requiring Gemini credentials for core operations.
+=======
+# NirmaanIQ - Enterprise Construction Intelligence Platform
+
+Frontend application built with React, Vite, TypeScript, Tailwind CSS, and Three.js, faithfully converted from the approved Google Stitch design export.
+
+## Architecture & Directory Structure
+
+```
+nirmaaniq-app/
+├── index.html                   # HTML entry point with Google Fonts & Material Symbols
+├── package.json                 # Dependencies (React 18, Vite 5, Tailwind 3, Three.js)
+├── postcss.config.js            # PostCSS configuration
+├── tailwind.config.js           # Exact design tokens matching DESIGN.md
+├── tsconfig.json                # TypeScript configuration
+├── vite.config.ts               # Vite configuration
+└── src/
+    ├── main.tsx                 # React DOM root render
+    ├── App.tsx                  # Core layout integrating all narrative sections
+    ├── index.css                # Global base styles & scrollbar reset
+    ├── types/
+    │   └── index.ts             # TypeScript interfaces for stages, metrics & pillars
+    ├── data/
+    │   └── mockData.ts          # Centralized data for telemetry, stages & testimonials
+    └── components/
+        ├── layout/
+        │   ├── Navbar.tsx       # Navigation header with language select & responsive drawer
+        │   └── Footer.tsx       # Enterprise footer with multi-column links & ISO badges
+        ├── ui/
+        │   └── WaveDivider.tsx  # Exact mathematical SVG wave section transitions
+        └── sections/
+            ├── HeroSection.tsx              # Hero container with announcement & typography
+            ├── HeroParticleWave.tsx         # 16,560-vertex Three.js KPIT particle wave
+            ├── MetricsBand.tsx              # 4-card value metrics telemetry band
+            ├── RealityComparison.tsx        # Legacy site chaos vs NirmaanIQ comparison
+            ├── ThreePillars.tsx             # Jobsite Ops, Predictive Intel, Stakeholder Trust
+            ├── BuildingEvolutionShowcase.tsx# 4-stage interactive SVG architectural blueprint
+            ├── Testimonials.tsx             # Enterprise developer quotes & client logos
+            └── CtaSection.tsx               # Enterprise consultation CTA & worksite dialects
+```
+
+## Getting Started
+
+### Development Server
+```bash
+npm run dev
+```
+
+### Production Build
+```bash
+npm run build
+```
+
+### Preview Production Build
+```bash
+npm run preview
+```
+>>>>>>> b2575b369039ce14c81d310cf1d94b0ebf05abe9
