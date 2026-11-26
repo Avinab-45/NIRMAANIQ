@@ -1,0 +1,727 @@
+{
+  "info": {
+    "name": "NirmaanIQ Construction Intelligence Backend API",
+    "_postman_id": "c1f7b8a2-3f19-4b89-a510-092576b88991",
+    "description": "Comprehensive Postman Collection for NirmaanIQ AI-Powered Construction Management Platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "builderToken",
+      "value": "YOUR_SUPABASE_BUILDER_JWT_HERE",
+      "type": "string"
+    },
+    {
+      "key": "contractorToken",
+      "value": "YOUR_SUPABASE_CONTRACTOR_JWT_HERE",
+      "type": "string"
+    },
+    {
+      "key": "clientToken",
+      "value": "YOUR_SUPABASE_CLIENT_JWT_HERE",
+      "type": "string"
+    },
+    {
+      "key": "projectCode",
+      "value": "PRJ-9X8K2M",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Auth",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Builder Activate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activationCode\": \"BUILDER-ACTIVATE-SECRET-2026\",\n  \"companyName\": \"Apex Infrastructure Ltd\",\n  \"licenseNumber\": \"BLD-998822\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/builder/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "builder", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Builder Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/builder/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "builder", "me"]
+            }
+          }
+        },
+        {
+          "name": "Contractor Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contractor@buildfast.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/contractor/request-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "contractor", "request-otp"]
+            }
+          }
+        },
+        {
+          "name": "Contractor Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contractor@buildfast.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/contractor/verify-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "contractor", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Client Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/client/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "client", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Skyline Heights Tower B\",\n  \"description\": \"24-story residential development\",\n  \"location\": \"Sector 62, Gurgaon\",\n  \"plannedStartDate\": \"2026-12-01\",\n  \"plannedEndDate\": \"2028-06-30\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            }
+          }
+        },
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Project by Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Skyline Heights Luxury Tower B\",\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}"]
+            }
+          }
+        },
+        {
+          "name": "Archive Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Project Members",
+      "item": [
+        {
+          "name": "Assign Contractor by Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"CONTRACTOR\",\n  \"email\": \"contractor@buildfast.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Assign Client by Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"CLIENT\",\n  \"email\": \"client@example.com\",\n  \"phoneNumber\": \"+919876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "List Project Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "members"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Phases",
+      "item": [
+        {
+          "name": "Create Phase",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Foundation & Piling\",\n  \"description\": \"Substructure earthwork and concrete piling\",\n  \"sequenceOrder\": 1,\n  \"startDate\": \"2026-12-01\",\n  \"targetCompletionDate\": \"2027-03-31\",\n  \"budget\": 2500000.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/phases",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "phases"]
+            }
+          }
+        },
+        {
+          "name": "List Phases",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/phases",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "phases"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Progress Updates",
+      "item": [
+        {
+          "name": "Submit Progress Update",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"percentageCompleted\": 38.5,\n  \"title\": \"Piling Grid 4-8 Finished\",\n  \"workCategory\": \"Civil Structure\",\n  \"areaCompleted\": 1250.50,\n  \"areaUnit\": \"SQFT\",\n  \"description\": \"Completed 24 reinforced concrete piles\",\n  \"workCompletedToday\": \"Poured 65 cubic meters of concrete\",\n  \"blockersDelays\": \"Groundwater seepage managed via sub-pump\",\n  \"hasBlockers\": false,\n  \"weatherNotes\": \"Clear, 24C\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "progress"]
+            }
+          }
+        },
+        {
+          "name": "List Progress Updates (With Optional Date Filter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/progress?page=0&size=20&date=2026-11-25",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "progress"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "date", "value": "2026-11-25" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Progress Updates for Specific Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/progress/date/2026-11-25",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "progress", "date", "2026-11-25"]
+            }
+          }
+        },
+        {
+          "name": "List Progress Updates",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/progress?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "progress"]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Progress Update",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/progress/latest",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "progress", "latest"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Media & Storage",
+      "item": [
+        {
+          "name": "Upload Media File",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [] },
+                { "key": "category", "value": "SITE_PHOTO", "type": "text" },
+                { "key": "caption", "value": "Foundation concrete pour on Grid 4", "type": "text" },
+                { "key": "progressUpdateId", "value": "{{progressUpdateId}}", "type": "text", "description": "Optional UUID linking photo to daily progress report" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "media"]
+            }
+          }
+        },
+        {
+          "name": "List Media Files",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "media"]
+            }
+          }
+        },
+        {
+          "name": "Trigger AI Media Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/media/{{mediaId}}/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "media", "{{mediaId}}", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Get Media AI Analyses History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/media/{{mediaId}}/analyses",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "media", "{{mediaId}}", "analyses"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Materials & Inventory",
+      "item": [
+        {
+          "name": "Create Material Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemCode\": \"TMT-16MM\",\n  \"name\": \"16mm TMT Steel Rebars\",\n  \"category\": \"Steel\",\n  \"unitOfMeasure\": \"TONNES\",\n  \"minimumThreshold\": 10.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/materials",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "materials"]
+            }
+          }
+        },
+        {
+          "name": "List Material Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/materials",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "materials"]
+            }
+          }
+        },
+        {
+          "name": "Record Material Transaction (RECEIVED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemCode\": \"TMT-16MM\",\n  \"transactionType\": \"RECEIVED\",\n  \"quantity\": 25.0,\n  \"unitPrice\": 850.00,\n  \"referenceNumber\": \"PO-99120\",\n  \"notes\": \"Delivered by Tata Steel Logistics\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/materials/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "materials", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get Inventory Levels",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "inventory"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Budgets & Expenses",
+      "item": [
+        {
+          "name": "Create Budget Line",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"MATERIALS\",\n  \"plannedAmount\": 12000000.00,\n  \"description\": \"Steel and concrete budget allocation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/budgets",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "budgets"]
+            }
+          }
+        },
+        {
+          "name": "Record Expense",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 212500.00,\n  \"category\": \"MATERIALS\",\n  \"vendor\": \"Tata Steel Ltd\",\n  \"invoiceNumber\": \"INV-4410\",\n  \"description\": \"Payment for 25 tonnes TMT steel\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/expenses",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "expenses"]
+            }
+          }
+        },
+        {
+          "name": "Get Financial Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/financial-summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "financial-summary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Labour",
+      "item": [
+        {
+          "name": "Log Labour",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tradeType\": \"MASON\",\n  \"headCount\": 6,\n  \"hoursWorked\": 8.0,\n  \"hourlyRate\": 50.0,\n  \"remarks\": \"Reinforcement fixing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/labour",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "labour"]
+            }
+          }
+        },
+        {
+          "name": "List Labour Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{contractorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/labour?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "labour"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. AI Insights",
+      "item": [
+        {
+          "name": "Get Risk Predictions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/ai/risks",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "ai", "risks"]
+            }
+          }
+        },
+        {
+          "name": "Get Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/ai/recommendations",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "ai", "recommendations"]
+            }
+          }
+        },
+        {
+          "name": "Get Productivity Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/ai/productivity",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "ai", "productivity"]
+            }
+          }
+        },
+        {
+          "name": "Get Project AI Photo Analyses History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectCode}}/ai/analyses?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{projectCode}}", "ai", "analyses"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{builderToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

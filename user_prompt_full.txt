@@ -1,0 +1,474 @@
+<USER_REQUEST>
+# NirmaanIQ – Complete Backend Audit, Supabase Integration, Security Fixes and Daily AI Construction Progress Implementation
+
+You are working on my existing NirmaanIQ project, a Spring Boot 3.3.5 / Java 21 construction management and AI-powered construction intelligence backend.
+
+I have already implemented most of the backend. Do NOT unnecessarily rewrite the project or replace existing functionality.
+
+Your task is to thoroughly inspect the entire existing codebase, fix remaining problems, integrate it correctly with my live Supabase PostgreSQL database, and implement the additional daily construction progress and AI photograph analysis functionality described below.
+
+## 1. IMPORTANT PROJECT REQUIREMENTS
+
+Preserve the existing architecture:
+
+- Java 21
+- Spring Boot 3.3.5
+- Maven
+- Spring Security
+- Supabase Auth
+- Supabase PostgreSQL
+- Supabase Storage
+- Spring Data JPA / Hibernate
+- REST APIs
+- JWT authentication
+- Email OTP
+- Existing role-based access control
+
+The existing project contains 23 database tables. I have added the following database modifications through Supabase SQL:
+
+1. Automatic profile creation through an auth.users trigger.
+2. Additional columns in progress_updates:
+   - work_category
+   - area_completed
+   - area_unit
+3. Additional progress_update_id in media_files.
+4. A new media_ai_analyses table for persistent AI image-analysis history.
+
+The database now contains 24 application tables.
+
+Do not delete or rename existing tables, columns, APIs, entities, or relationships unnecessarily.
+
+Read:
+- supabase_schema.sql
+- supabase_migration_timestamps.sql
+- DATABASE_COMPATIBILITY_CHECKLIST.md
+- SUPABASE_SETUP.md
+- API_DOCUMENTATION.md
+- README.md
+
+Use the actual deployed database structure described above as the source of truth.
+
+## 2. SUPABASE DATABASE INTEGRATION
+
+Ensure the application connects successfully to the live Supabase PostgreSQL database.
+
+Use environment variables:
+
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+SUPABASE_URL
+SUPABASE_JWKS_URL
+SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_STORAGE_BUCKET
+MAIL_HOST
+MAIL_PORT
+MAIL_USERNAME
+MAIL_PASSWORD
+MAIL_FROM
+BUILDER_ACTIVATION_CODE
+AI_PROVIDER_ENABLED
+AI_PROVIDER_API_KEY
+
+Requirements:
+
+- PostgreSQL connection must use SSL.
+- Hibernate ddl-auto must remain validate.
+- Do not use create, create-drop or update.
+- All UUID relationships must match Supabase.
+- All JPA table names, column names, enum names and timestamp types must match the SQL schema.
+- Never hardcode credentials.
+- Never expose the service-role key to the frontend.
+- Fail clearly when mandatory configuration is missing.
+
+Check every entity against the deployed SQL schema, not just the main tables.
+
+## 3. AUTHENTICATION AND THREE USER ROLES
+
+Maintain three roles:
+
+ROLE_BUILDER
+ROLE_CONTRACTOR
+ROLE_CLIENT
+
+All authentication must use Supabase Auth.
+
+### Builder
+
+- Email/password registration through Supabase Auth.
+- Email verification through Supabase.
+- Builder login through Supabase.
+- Backend builder activation using the configured activation code.
+- Backend assigns ROLE_BUILDER.
+- Builder can create projects.
+- Each project gets a UUID and unique project code.
+- Builder can add Contractors and Clients through registered, verified email addresses.
+- Builder can see and manage only projects they own.
+
+### Contractor
+
+- Email/password registration through Supabase.
+- Email verification through Supabase.
+- Contractor login through Supabase.
+- Backend verifies active Contractor invitation.
+- Contractor requests a second email OTP.
+- OTP is sent to the authenticated user's registered email.
+- OTP expires after five minutes.
+- Maximum five incorrect attempts.
+- Resend cooldown of 60 seconds.
+- Store only hashed OTP values in otp_challenges.
+- OTP is single-use.
+- Successful OTP verification activates Contractor access.
+- Contractor must only access projects to which they are actively assigned.
+
+### Client
+
+- Email-based Supabase authentication.
+- Email OTP/passwordless login as configured in the frontend.
+- No SMS or Twilio.
+- Backend verifies the actual Supabase Auth identity and confirmed email.
+- Client must match the email and UUID in profiles.
+- Client must have an existing active project_members assignment.
+- Client receives ROLE_CLIENT.
+- Client is strictly read-only.
+
+IMPORTANT SECURITY REQUIREMENTS:
+
+- Never trust role information supplied by the frontend.
+- Never trust a frontend-supplied email_verified flag.
+- Never trust a project ID as proof of authorization.
+- Verify JWT signatures, expiration, audience and issuer.
+- Verify the user's UUID against the Supabase identity.
+- Do not allow clients to access projects assigned to other clients.
+- Do not allow contractors to access projects belonging to other builders.
+- Do not allow unauthorized role escalation.
+
+Inspect and fix profile creation, project invitation, client assignment and contractor activation flows.
+
+Do not create duplicate profiles or duplicate memberships.
+
+## 4. DAILY CONSTRUCTION PROGRESS – NEW FUNCTIONALITY
+
+This is a mandatory feature.
+
+A Contractor must be able to submit daily construction work completed manually.
+
+The existing progress_updates table now contains:
+
+- work_category
+- area_completed
+- area_unit
+
+Update the Java entity, DTOs, validation and service layer accordingly.
+
+The daily progress request must support:
+
+- projectCode
+- phaseId (optional)
+- workCategory
+- areaCompleted
+- areaUnit
+- percentageCompleted
+- title
+- description
+- workCompletedToday
+- blockersDelays
+- hasBlockers
+- weatherNotes
+- updateDate
+
+Example:
+
+{
+  "workCategory": "BRICKWORK",
+  "areaCompleted": 250,
+  "areaUnit": "SQFT",
+  "percentageCompleted": 35,
+  "title": "First floor brickwork progress",
+  "description": "Brickwork completed on first floor.",
+  "workCompletedToday": "250 SQFT of brickwork completed.",
+  "hasBlockers": false,
+  "updateDate": "2026-11-19"
+}
+
+Requirements:
+
+- Store the report in progress_updates.
+- Associate it with the correct project UUID.
+- Associate it with the authenticated Contractor UUID.
+- Validate non-negative area.
+- Validate percentage between 0 and 100.
+- Validate allowed measurement units.
+- Validate phase belongs to the same project.
+- Prevent unauthorized users from submitting reports.
+- Preserve historical daily records.
+- Do not overwrite previous reports when a new daily report is submitted.
+- Return all measurement details in API responses.
+- Support date-wise and project-wise progress retrieval.
+
+Do not confuse daily area completed with overall project percentage completed.
+
+## 5. SITE PHOTOGRAPH UPLOAD
+
+Contractors must upload site photographs for AI analysis.
+
+Use the existing private Supabase Storage bucket:
+
+construction-media
+
+Requirements:
+
+- Maximum file size: 25 MB.
+- Validate MIME type.
+- Generate unique filenames.
+- Use project-code-based storage folders.
+- Upload photographs to private Supabase Storage.
+- Save metadata in media_files.
+- Save the authenticated uploader UUID.
+- Save project UUID.
+- Save the corresponding progress_update_id.
+- Generate signed URLs for authorized viewing.
+- Never make the bucket public.
+
+A photograph must be associated with the correct daily progress report.
+
+Modify MediaFile entity and MediaService to support progress_update_id.
+
+The backend must verify that:
+- The progress report belongs to the requested project.
+- The uploader is authorized to upload to that project.
+- The uploaded image is associated with the correct report.
+
+Preserve the existing document upload functionality.
+
+## 6. ACTUAL AI IMAGE ANALYSIS – MANDATORY
+
+The existing AiService mostly retrieves stored AI insights. It does not currently provide the complete site-photo analysis workflow.
+
+Implement actual AI image analysis.
+
+Use the configured AI provider through a dedicated service abstraction.
+
+Do not fabricate AI results.
+
+Required workflow:
+
+1. Contractor uploads site photograph.
+2. Image is saved to Supabase Storage.
+3. media_files record is created.
+4. An analysis record is created in media_ai_analyses with status PENDING.
+5. Analysis status changes to PROCESSING.
+6. The AI provider receives the authorized photograph.
+7. AI analyses the visible construction work.
+8. AI result is validated and saved.
+9. Status becomes COMPLETED.
+10. If processing fails, status becomes FAILED with an appropriate error message.
+
+Persist:
+
+- media_file_id
+- project_id
+- analyzed_by
+- status
+- ai_provider
+- ai_model
+- analysis_summary
+- detected_work_category
+- estimated_completion_percentage
+- detected_issues
+- recommendations
+- raw_analysis
+- error_message
+- created_at
+- completed_at
+
+Use the existing JSONB columns in the database.
+
+AI should analyse only what can reasonably be observed in photographs.
+
+It may identify:
+- Visible construction activity.
+- Work category.
+- Visible completion indicators.
+- Possible unfinished areas.
+- Visible quality concerns.
+- Potential inconsistencies.
+- Recommendations for further inspection.
+
+Do not claim that AI can reliably determine exact physical dimensions from ordinary photographs.
+
+Do not replace the Contractor's manually entered area with AI estimates.
+
+Keep the two measurements independent.
+
+If the provider is unavailable:
+- Save an appropriate FAILED status.
+- Preserve the uploaded photograph.
+- Return an honest error/status response.
+- Allow retrying analysis.
+
+Implement an analysis-history retrieval endpoint.
+
+Suggested APIs:
+
+POST /api/projects/{projectCode}/media/{mediaId}/analyze
+
+GET /api/projects/{projectCode}/media/{mediaId}/analyses
+
+GET /api/projects/{projectCode}/ai/analyses
+
+Ensure all endpoints validate project membership and permissions.
+
+Do not break existing AI risk, recommendation and productivity endpoints.
+
+## 7. BUILDER AND CLIENT REPORTING
+
+Builder should be able to see:
+
+- All daily progress reports.
+- Contractor name and email.
+- Date-wise area completed.
+- Work category.
+- Uploaded site photographs.
+- AI analysis status.
+- AI analysis summary.
+- Detected issues.
+- Recommendations.
+- Project-wide progress history.
+
+Client should be able to view permitted project reports and photographs, but cannot submit or modify them.
+
+Do not allow unauthorized users to see signed URLs or analysis records from unrelated projects.
+
+## 8. DATABASE ENTITY COMPATIBILITY
+
+Update all required JPA entities, repositories, services, DTOs and controllers.
+
+Create a MediaAiAnalysis entity mapped exactly to media_ai_analyses.
+
+Ensure:
+- UUID primary keys.
+- Correct foreign keys.
+- Correct JSONB mappings.
+- Correct timestamp mappings.
+- Correct numeric precision.
+- Correct enum handling.
+- Correct cascade behavior.
+
+Do not introduce accidental schema changes.
+
+Do not generate new tables without explaining why they are necessary.
+
+## 9. SECURITY AUDIT
+
+Inspect the entire backend for:
+
+- IDOR vulnerabilities.
+- Unauthorized project access.
+- Missing ownership checks.
+- Incorrect role assignments.
+- Email mismatches.
+- Unverified account access.
+- OTP replay.
+- OTP brute force.
+- OTP leakage in logs.
+- Storage exposure.
+- SQL injection.
+- Missing validation.
+- Incorrect error handling.
+- Sensitive credential leakage.
+
+Use backend authorization on every protected endpoint.
+
+Keep service-role credentials server-side.
+
+Do not create permissive Supabase RLS policies.
+
+## 10. API DOCUMENTATION AND POSTMAN
+
+Update API_DOCUMENTATION.md and README.md.
+
+Update the existing Postman collection.
+
+Add requests for:
+
+- Builder registration/activation.
+- Contractor registration.
+- Contractor OTP request.
+- Contractor OTP verification.
+- Client login.
+- Project creation.
+- Contractor assignment.
+- Client assignment.
+- Daily progress submission.
+- Site photograph upload.
+- AI analysis request.
+- AI analysis history.
+- Date-wise progress retrieval.
+
+Document all request fields and expected responses.
+
+Correct outdated documentation referring to Twilio/SMS.
+
+## 11. TESTING
+
+Run Maven tests and add missing tests.
+
+Test:
+
+1. Valid Builder login.
+2. Invalid Builder credentials.
+3. Builder activation with incorrect code.
+4. Valid Contractor login.
+5. Contractor login without an active invitation.
+6. Wrong Contractor OTP.
+7. Expired OTP.
+8. Reused OTP.
+9. OTP after five incorrect attempts.
+10. Client login with verified email.
+11. Client login with unverified email.
+12. Wrong email-to-profile assignment.
+13. Unauthorized project access.
+14. Contractor accessing another project's data.
+15. Client attempting to submit progress.
+16. Valid daily area submission.
+17. Negative area rejection.
+18. Valid photograph upload.
+19. Invalid MIME type rejection.
+20. Photograph linked to the wrong project.
+21. Successful AI analysis persistence.
+22. Failed AI analysis handling.
+23. AI analysis history retrieval.
+24. Signed URL generation.
+25. Unauthorized media access.
+
+Use mocks for external AI and email provider tests.
+
+Do not claim that live Supabase integration has been verified unless you actually connect to the configured database.
+
+## 12. FINAL DELIVERABLES
+
+After completing the work:
+
+1. Give me a detailed list of all changed files.
+2. Explain every database-related change.
+3. List all new and modified API endpoints.
+4. Provide the exact commands to run the backend.
+5. Provide the exact Postman testing procedure.
+6. Identify any remaining configuration I must complete manually.
+7. Report all tests that passed and failed.
+8. Report any remaining security concerns.
+
+Do not simply say that the project is fixed.
+
+Actually inspect, implement, compile and test the code.
+
+Do not remove existing working modules.
+
+Do not use fake AI responses, hardcoded users, hardcoded OTPs or in-memory database substitutes for live functionality.
+
+The final result must be a working NirmaanIQ backend integrated with Supabase, supporting all three roles, daily manual construction area reporting, private site-photo uploads and persistent AI image-analysis history.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-11-19T12:26:15+05:30.
+</ADDITIONAL_METADATA>
